@@ -8,6 +8,6 @@ namespace FetchData.Interfaces
 {
     public interface ISymbolService
     {
-        Task<Page<Symbol>> AddSymbolsFromApi();
+        Task AddSymbolsFromApi();
     }
 }

@@ -1,6 +1,8 @@
-﻿using FetchData.Interfaces;
+﻿using FetchData.Api;
+using FetchData.Interfaces;
 using FetchData.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -14,28 +16,29 @@ namespace FetchData.Services
     {
         private ISymbolRepository symbolRepository;
 
-        private int page = 1;
+        private PolygonApiClient client;
 
-        IConfiguration config;
+        private const int perPage = 1000;
 
-        private HttpClient client;
-
-
-        public SymbolService(ISymbolRepository symbolRepository, IConfiguration config)
+        public SymbolService(ISymbolRepository symbolRepository, PolygonApiClient client)
         {
             this.symbolRepository = symbolRepository;
-            this.config = config;
-            client = new HttpClient()
-            {
-                BaseAddress = new Uri(config.GetSection("apiUrl").Get<string>())
-            };
+            this.client = client;
         }
 
-        public async Task<Page<Symbol>> AddSymbolsFromApi()
+        public async Task AddSymbolsFromApi()
         {
-            Page<Symbol> symbols = await client.GetFromJsonAsync<Page<Symbol>>($"tickers?apiKey={config.GetSection("apiKey").Get<string>()}&page={page++}&perpage=1000");
-            await symbolRepository.AddSymbols(symbols.Tickers);
-            return symbols;
+            var pageNumber = 1;
+            Page<Symbol> page;
+            do
+            {
+                Console.SetCursorPosition(0, 1);
+                page = await client.GetSymbols(pageNumber++, perPage);
+                await symbolRepository.AddSymbols(page.Tickers);
+                Console.WriteLine($"{ (int)(((double)(page.page * page.PerPage) / (double)page.Count) * 100)}% done.");
+            }
+            while (page.page <= page.Count / page.PerPage);
+           
         }
     }
 }
