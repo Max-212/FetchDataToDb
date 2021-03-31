@@ -19,7 +19,7 @@ namespace FetchData
 
             Console.CursorVisible = false;
             Console.WriteLine("Starting Fetch data from api to database...");
-            await symbolService.AddSymbolsFromApi();
+            await symbolService.UpdateSymbolsAsync();
             Console.SetCursorPosition(0, 2);
             Console.WriteLine("Finished");
         }

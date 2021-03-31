@@ -4,9 +4,9 @@
       "commandName": "Project",
       "environmentVariables": {
         "Key": "Value",
-        "connectionString": "User ID=postgres;Password=admin;Host=localhost;Port=5432;Database=SymbolsDatabase;",
-        "apiKey": "7YqUopMGrntgjzG5oykJK6MBLfy2kIkQ",
-        "apiUrl": "https://api.polygon.io/v2/reference/"
+        "ConnectionString": "User ID=postgres;Password=admin;Host=localhost;Port=5432;Database=SymbolsDatabase;",
+        "ApiKey": "7YqUopMGrntgjzG5oykJK6MBLfy2kIkQ",
+        "ApiUrl": "https://api.polygon.io/v2/reference/"
       }
     }
   }

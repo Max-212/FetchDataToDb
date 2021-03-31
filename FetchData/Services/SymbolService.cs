@@ -26,18 +26,20 @@ namespace FetchData.Services
             this.client = client;
         }
 
-        public async Task AddSymbolsFromApi()
+        public async Task UpdateSymbolsAsync()
         {
             var pageNumber = 1;
             Page<Symbol> page;
+            await symbolRepository.DelistSymbolsAsync();
             do
             {
                 Console.SetCursorPosition(0, 1);
                 page = await client.GetSymbols(pageNumber++, perPage);
-                await symbolRepository.AddSymbols(page.Tickers);
+                await symbolRepository.MergeSymbolsAsync(page.Tickers);
                 Console.WriteLine($"{ (int)(((double)(page.page * page.PerPage) / (double)page.Count) * 100)}% done.");
             }
             while (page.page <= page.Count / page.PerPage);
+            await symbolRepository.CommitAsync();
            
         }
     }

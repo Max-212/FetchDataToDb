@@ -8,6 +8,10 @@ namespace FetchData.Interfaces
 {
     public interface ISymbolRepository
     {
-        Task AddSymbols(List<Symbol> symbols);
+        Task MergeSymbolsAsync(List<Symbol> symbols);
+
+        Task CommitAsync();
+
+        Task DelistSymbolsAsync();
     }
 }

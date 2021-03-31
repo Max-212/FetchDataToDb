@@ -20,13 +20,13 @@ namespace FetchData.Api
             this.settings = settings.Value;
             client = new HttpClient()
             {
-                BaseAddress = new Uri(this.settings.apiUrl)
+                BaseAddress = new Uri(this.settings.ApiUrl)
             };
         }
 
         public async Task<Page<Symbol>> GetSymbols(int pageNumber, int perPage)
         {
-            var page = await client.GetFromJsonAsync<Page<Symbol>>($"tickers?apiKey={settings.apiKey}&page={pageNumber}&perpage={perPage}");
+            var page = await client.GetFromJsonAsync<Page<Symbol>>($"tickers?apiKey={settings.ApiKey}&page={pageNumber}&perpage={perPage}");
             return page;
         }
     }

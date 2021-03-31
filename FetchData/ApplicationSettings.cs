@@ -6,10 +6,10 @@ namespace FetchData
 {
     public class ApplicationSettings
     {
-        public string apiKey { get; set; }
+        public string ApiKey { get; set; }
 
-        public string connectionString { get; set; }
+        public string ConnectionString { get; set; }
 
-        public string apiUrl { get; set; }
+        public string ApiUrl { get; set; }
     }
 }
