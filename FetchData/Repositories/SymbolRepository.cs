@@ -16,8 +16,6 @@ namespace FetchData.Repositories
     {
         private ApplicationSettings settings;
 
-        private NpgsqlConnection connection;
-
         private string sqlInsert = $@"
             Insert into Symbols (
                Ticker, Name, Market, Locale, Currency, Active, PrimaryExch, Updated, cik, Figiuid, Scfigi, Cfigi, Figi, Url)
@@ -28,53 +26,69 @@ namespace FetchData.Repositories
                    PrimaryExch = @PrimaryExch, Updated = @Updated, cik = @cik, Figiuid = @Figiuid, Scfigi = @Scfigi,
                    Cfigi = @Cfigi, Figi = @Figi, Url = @Url, Delisted = false";
 
-        private string sqlDelist = $@"Begin;
-            Update Symbols set Delisted = true where Delisted = false";
+        private string sqlDelist = $@"
+            Update Symbols set Delisted = true where Ticker = @Ticker";
+
+        private string sqlSelect = "Select * from Symbols";
 
 
         public SymbolRepository(IOptions<ApplicationSettings> settings)
         {
             this.settings = settings.Value;
-            connection = new NpgsqlConnection(this.settings.ConnectionString);
+            
         }
 
 
         public async Task MergeSymbolsAsync(List<Symbol> symbols)
         {
-            List<object> rows = new List<object>();
-            foreach (var symbol in symbols)
+            using(var connection = new NpgsqlConnection(settings.ConnectionString))
             {
-                rows.Add(new
+                List<object> rows = new List<object>();
+                foreach (var symbol in symbols)
                 {
-                    Ticker = symbol.Ticker,
-                    Name = symbol.Name,
-                    Market = symbol.Market,
-                    Locale = symbol.Locale,
-                    Currency = symbol.Currency,
-                    Active = symbol.Active,
-                    PrimaryExch = symbol.PrimaryExch,
-                    Updated = symbol.Updated,
-                    cik = symbol.Codes?.Cik,
-                    Figiuid = symbol.Codes?.Figiuid,
-                    Scfigi = symbol.Codes?.Scfigi,
-                    Cfigi = symbol.Codes?.Cfigi,
-                    Figi = symbol.Codes?.Figi,
-                    Url = symbol.Url
-                });
+                    rows.Add(new
+                    {
+                        Ticker = symbol.Ticker,
+                        Name = symbol.Name,
+                        Market = symbol.Market,
+                        Locale = symbol.Locale,
+                        Currency = symbol.Currency,
+                        Active = symbol.Active,
+                        PrimaryExch = symbol.PrimaryExch,
+                        Updated = symbol.Updated,
+                        cik = symbol.Codes?.Cik,
+                        Figiuid = symbol.Codes?.Figiuid,
+                        Scfigi = symbol.Codes?.Scfigi,
+                        Cfigi = symbol.Codes?.Cfigi,
+                        Figi = symbol.Codes?.Figi,
+                        Url = symbol.Url
+                    });
+                }
+                await connection.ExecuteAsync(sqlInsert, rows);
             }
-            await connection.ExecuteAsync(sqlInsert, rows);
         }
 
-        public async Task DelistSymbolsAsync()
+        public async Task DelistSymbolsAsync(List<Symbol> symbols)
         {
-            await connection.OpenAsync();
-            await connection.ExecuteAsync(sqlDelist);
+            using (var connection = new NpgsqlConnection(settings.ConnectionString))
+            {
+                List<object> rows = new List<object>();
+                foreach(var symbol in symbols)
+                {
+                    rows.Add(new { Ticker = symbol.Ticker });
+                }
+                await connection.ExecuteAsync(sqlDelist, rows);
+            }
         }
 
-        public async Task CommitAsync()
+        public async Task<List<Symbol>> GetSymbolsAsync()
         {
-            await connection.ExecuteAsync("Commit;");
-            await connection.CloseAsync();
+            using(var connection = new NpgsqlConnection(settings.ConnectionString))
+            {
+                var result = await connection.QueryMultipleAsync(sqlSelect);
+                var symbols = await result.ReadAsync<Symbol>();
+                return symbols.ToList();
+            }
         }
     }
 }

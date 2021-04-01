@@ -22,7 +22,7 @@ namespace FetchData
             services.AddSingleton<ISymbolService, SymbolService>();
             services.AddSingleton<ISymbolRepository, SymbolRepository>();
             services.AddSingleton<PolygonApiClient>();
-            
+            services.AddSingleton<IEventRepository, EventRepository>();
             return services.BuildServiceProvider();
         }
 

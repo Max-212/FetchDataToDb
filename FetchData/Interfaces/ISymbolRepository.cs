@@ -10,8 +10,8 @@ namespace FetchData.Interfaces
     {
         Task MergeSymbolsAsync(List<Symbol> symbols);
 
-        Task CommitAsync();
+        Task<List<Symbol>> GetSymbolsAsync();
 
-        Task DelistSymbolsAsync();
+        Task DelistSymbolsAsync(List<Symbol> symbols);
     }
 }
