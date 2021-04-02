@@ -25,5 +25,7 @@ namespace FetchData.Models
         public string Url { get; set; }
 
         public Codes Codes { get; set; }
+
+        public bool Delisted { get; set; }
     }
 }

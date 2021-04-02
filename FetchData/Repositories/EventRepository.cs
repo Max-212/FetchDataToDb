@@ -23,8 +23,6 @@ namespace FetchData.Repositories
             this.settings = settings.Value;
         }
 
-
-
         public async Task AddEventAsync(List<Symbol> symbols, string type)
         {
             using (var connection = new NpgsqlConnection(settings.ConnectionString))
